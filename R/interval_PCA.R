@@ -1,10 +1,15 @@
 interval_PCA<- function(x=NULL,centers=NULL,radii=NULL,std_meth="centers",
                         obs_names=NULL, var_names=NULL,
                         method=c("mrpca","cpca","vpca"),supp=0){
-  source("int_standardization.R")
-  source("radius_rotation.R")
-  library(tidyverse)
-  library(FactoMineR)
+  
+  source("R/int_standardization.R")
+  source("R/radius_rotation.R")
+  source("R/vertex_mat_make.R")
+  source("R/plot.interval_PCA_cpca.R")
+  source("R/plot.interval_PCA_vpca.R")
+  source("R/plot.interval_PCA_mrpca.R")
+  
+  
   # n <- dim(centers)[1] 
   # p <- dim(centers)[2]
   
@@ -203,7 +208,7 @@ interval_PCA<- function(x=NULL,centers=NULL,radii=NULL,std_meth="centers",
     
   }else if(method=="vpca"){
     
-    source("vertex_mat_make.R")
+    
     pp=ncol(x)
     interval_min = as_tibble(out_int$cc-out_int$dd) %>% mutate(what="min")
     interval_max = as_tibble(out_int$cc+out_int$dd) %>% mutate(what="max")
@@ -212,7 +217,7 @@ interval_PCA<- function(x=NULL,centers=NULL,radii=NULL,std_meth="centers",
     vx_mat = vx_out$vx_mat
     vx_id=vx_out$ids
     
-    library("FactoMineR")
+    
     out=list()
     pca_centers = PCA(vx_mat,scale.unit = FALSE, graph=FALSE)
     

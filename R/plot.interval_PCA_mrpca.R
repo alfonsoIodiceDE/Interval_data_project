@@ -1,23 +1,14 @@
 plot.interval_PCA_mrpca<-function(x,obs_names=NULL,var_names=NULL){
-  library(tidyverse)
+
   library(ggrepel)
   library(ggforce)
-  # x: interval PCA output object
-  
-  # if(is.null(var_names)){
-  #   var_names <- paste0("var_",1:ncol(C))
-  # }
-  # 
-  # if(is.null(obs_names)){
-  #   obs_names <- paste0("ob_",1:nrow(C))  
-  # }
+
   
   
-  x=out_mrpca
   
-  x$variable_names = colnames(F_Rec)[seq(from=2,to=12,by=2)] 
+
     
-  out_mrpca$last_rot_rad_coord
+
   # graph 1: initial solution
   p <- ncol(x$first_rot_rad_coord)
   pp <- 2*p
@@ -50,7 +41,8 @@ plot.interval_PCA_mrpca<-function(x,obs_names=NULL,var_names=NULL){
   last_rot_rad_coord <- as_tibble(x$last_rot_rad_coord) 
   names(last_rot_rad_coord) <- paste0("ls_r_coord",1:p)
   
-  final_plot <- bind_cols(cen_coord,last_rot_rad_coord) %>% pivot_longer(names_to = "elem",values_to="value",cols=1:ncol(.)) %>% 
+  final_plot <- bind_cols(cen_coord,last_rot_rad_coord) %>% 
+    pivot_longer(names_to = "elem",values_to="value",cols=1:ncol(.)) %>% 
     separate(elem,sep="_c",into=c("what","dimension")) %>% 
     mutate(dimension=str_replace(dimension,pattern="oo",replacement = "coo")) %>% 
     pivot_wider(names_from = what,values_from=value,values_fn = list) %>% unnest(everything()) %>% 
@@ -65,7 +57,7 @@ plot.interval_PCA_mrpca<-function(x,obs_names=NULL,var_names=NULL){
     geom_segment(aes(x=cen_coord1,y=cen_coord2,xend=cen_coord1+ls_r_coord1,
                      yend=cen_coord2+ls_r_coord2),col="blue") +ggtitle("Midpoint-radii Principal Component Analysis")
   
-  ggsave("MR_PCA_f_r_sol.pdf", final_plot, width=8, height=6)
+  
   
   ##### sovrapporre rotated vs non rotated ranges
   
@@ -101,10 +93,10 @@ plot.interval_PCA_mrpca<-function(x,obs_names=NULL,var_names=NULL){
   
   ### IJAS PAPER FIGURES not needed for the function
   # 
-  ggsave("MR_PCA_f_r_sol.pdf", final_plot, width=8, height=6)
-  ggsave("MR_PCA_rad_coords.pdf", rad_coord_plot, width=8, height=6)
-  ggsave("MR_PCA_cen_cor.pdf", center_corr_plot, width=6, height=6)
-  ggsave("MR_PCA_rad_cor.pdf", radii_corr_plot, width=6, height=6)
+  # ggsave("MR_PCA_f_r_sol.pdf", final_plot, width=8, height=6)
+  # ggsave("MR_PCA_rad_coords.pdf", rad_coord_plot, width=8, height=6)
+  # ggsave("MR_PCA_cen_cor.pdf", center_corr_plot, width=6, height=6)
+  # ggsave("MR_PCA_rad_cor.pdf", radii_corr_plot, width=6, height=6)
   
   return(out)
 }

@@ -2,7 +2,7 @@ int_standardization<-function(x=NULL,centers, radii, std_meth="centers"){
   n <- dim(centers)[1] 
   p <- dim(centers)[2] 
   
-  library(tidyverse)
+  
   if(is.null(x)&&is.null(centers)){
     print("data must be provided either in intervals, or in centers and radii")
   }
@@ -32,7 +32,7 @@ int_standardization<-function(x=NULL,centers, radii, std_meth="centers"){
     iS <- solve(diag(diag(Cov))^0.5)
     tol <- 0.00001
     if(((sum(mediac)<tol)&& (abs(sum(diag(C)-p))<tol))){
-      print("I dati sono standardizzati")
+      print("the variables are already standardized")
       Cc <- C
       Rc <- R
     }else{
@@ -69,7 +69,7 @@ int_standardization<-function(x=NULL,centers, radii, std_meth="centers"){
     iS <- diag(1/sqrt(diag(Cov)))
     tol <- 0.00001
     if(((sum(mediac)<tol)&& (abs(sum(diag(C)-p))<tol))){
-      print("I dati sono standardizzati")
+      print("the variables are already standardized")
       cc <- C
       dd <- R
     }else{

@@ -1,0 +1,76 @@
+---
+title: "Supplementary Material"
+subtitle: "Principal component analysis for interval data: common approaches and variations"
+# date: "1/25/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+This is the code needed to replicate the application as reported in the paper.  
+
+```{r,warning=FALSE, message=FALSE}
+library("tidyverse")
+library("FactoMineR")
+library("janitor")
+library("patchwork")
+source("R/interval_PCA.R")
+```
+
+
+#### The Face Recognition data set
+
+```{r,warning=FALSE, message=FALSE}
+face_reco = read_csv2(file = "data/Face_recognition.csv")
+obs_names = face_reco %>% dplyr::select(`...1`) %>% pull()
+face_reco = face_reco %>% dplyr::select(-`...1`)
+var_names = face_reco %>% names() %>% str_to_lower() %>% unique()  
+```
+
+
+#### Centers PCA 
+
+```{r,warning=FALSE, message=FALSE}
+out_cpca = interval_PCA(x=face_reco,method = "cpca",std_meth="centers",
+                        obs_names = obs_names,var_names = var_names)
+plot(out_cpca)$rect_plot
+```
+
+#### Vertices PCA 
+```{r,warning=FALSE, message=FALSE}
+out_vpca=interval_PCA(x = face_reco, method = "vpca",std_meth="centers",
+                      obs_names = obs_names ,var_names = var_names)
+plot(out_vpca)$vpca_plot
+```
+
+
+#### Mid-point and radii PCA 
+```{r,warning=FALSE, message=FALSE}
+out_mrpca=interval_PCA(x = face_reco,method = "mrpca",std_meth = "symb",
+                       obs_names = obs_names, var_names = var_names)
+mrca_plots = plot(out_mrpca)
+```
+
+##### correlations 
+
+```{r,warning=FALSE, message=FALSE}
+out_mrpca=interval_PCA(x = face_reco,method = "mrpca",std_meth = "symb",
+                       obs_names = obs_names, var_names = var_names)
+mrca_plots$center_corr_plot + mrca_plots$radii_corr_plot
+```
+
+##### Ranges coordinates plot
+
+```{r,warning=FALSE, message=FALSE}
+mrca_plots$rad_coord_plot
+```
+
+##### MR-PCA rectangles plot
+
+```{r,warning=FALSE, message=FALSE}
+mrca_plots$final_plot
+```
+
