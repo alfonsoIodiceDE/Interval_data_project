@@ -1,4 +1,5 @@
 rm(list=ls())
+library(usethis)
 library(tidyverse)
 source("interval_PCA.r")
 source("plot.interval_PCA_cpca.R")
