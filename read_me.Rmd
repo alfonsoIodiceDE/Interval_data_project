@@ -1,5 +1,5 @@
 ---
-title: "Supplementary Material"
+title: "Supplementary Material modified"
 subtitle: "Principal component analysis for interval data: common approaches and variations"
 # date: "1/25/2022"
 output: html_document
