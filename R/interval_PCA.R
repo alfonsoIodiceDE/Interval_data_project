@@ -142,12 +142,26 @@ interval_PCA<- function(x=NULL,centers=NULL,radii=NULL,std_meth="centers",
     
     rot_out=radius_rotation(scaled_C=cc,scaled_R=dd)
     vars<-(t(nw1)%*%nw1+t(rot_out$last_rot_rad_coord)%*%rot_out$last_rot_rad_coord+abs(t(nw1)%*%rot_out$last_rot_rad_coord)+abs(t(rot_out$last_rot_rad_coord)%*%abs(nw1)))/n
-    In<-sum(diag(vars))*100/sum(diag(out_int$glob_var))
+    # In<-sum(diag(vars))*100/sum(diag(out_int$glob_var))
     
     out = rot_out
     out$cen_coord=nw1
     out$no_rot_rad_coord=nw2
-    out$mrpca_inertia=In
+    
+    psi_r = out$last_rot_rad_coord
+    psi_c=out$cen_coord
+    
+    #################################
+    #################################
+    psi_cv2<-((abs(t(psi_c))%*%abs(psi_r))+(abs(t(psi_r))%*%abs(psi_c)))/n
+    psi_ccc<-(t(psi_c)%*%psi_c)/n #matrice di varianza e covarianza dei centri finali
+    psi_inertia_centers<-sum(diag(psi_ccc))
+    psi_ddd<-(t(psi_r)%*%psi_r)/n  #matrice di varianza e covarianza dei raggi finali 
+    psi_inertia_radii<-sum(diag(psi_ddd))
+    psi_InTotale<-(psi_ccc+psi_ddd+psi_cv2)
+    reconstructed_inertia=sum(diag(psi_InTotale))/sum(diag(InTotale))
+    #################################
+    #################################
     
     ctr=sqrt(diag(out$last_rot_rad_coord[,1:2]%*%t(out$last_rot_rad_coord[,1:2])))/sqrt(diag(data.matrix(out$scaled_rad)%*%t(data.matrix(out$scaled_rad))))
     ctr=ctr/max(ctr)*1.01
@@ -159,9 +173,11 @@ interval_PCA<- function(x=NULL,centers=NULL,radii=NULL,std_meth="centers",
     out$observations_names=obs_names
     out$inertia_centers=inertia_centers
     out$inertia_radii=inertia_radii
+    out$inertia_total = sum(diag(InTotale))
+    out$inertia_reco_perc = round(reconstructed_inertia*100,1)
     out$scaled_C=out_int$cc
     out$scaled_R=out_int$dd
-    out$corr=out_int$Corr
+    # out$corr=out_int$Corr
     
     class(out)="interval_PCA_mrpca"
   }

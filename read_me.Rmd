@@ -1,5 +1,5 @@
 ---
-title: "Supplementary Material modified"
+title: "Supplementary Material"
 subtitle: "Principal component analysis for interval data: common approaches and variations"
 # date: "1/25/2022"
 output: html_document
@@ -17,6 +17,7 @@ library("tidyverse")
 library("FactoMineR")
 library("janitor")
 library("patchwork")
+source("R/interval_PCA.R")
 source("R/interval_PCA.R")
 ```
 
@@ -73,4 +74,70 @@ mrca_plots$rad_coord_plot
 ```{r,warning=FALSE, message=FALSE}
 mrca_plots$final_plot
 ```
+
+
+#### Simulation study
+
+The evaluation of the next chunk may take some time. You can skip it and load the data structures from the next chunk.
+
+```{r, eval=FALSE}
+library(MASS)
+source("R/interval_data_maker.R")
+set.seed(1234)
+alpha<-c(0.2,0.5,0.8)
+tau<-c(0.8,0.6,0.4)
+parameters = tibble(alpha,tau) %>% expand(alpha,tau,rep = 1:100)
+
+
+
+
+list_pams = parameters %>% pmap(~c(...))
+# list_pams [[1]][2] %>% as.numeric 
+
+data_list = parameters %>% pmap(~c(...)) %>% map(~interval_data_maker(.x))
+
+results_list_S1 = data_list %>% map(~interval_PCA(centers=.x$M,radii=.x$S1,
+                                                  method="mrpca",std_meth = "symb"))
+
+results_list_S2 = data_list %>% map(~interval_PCA(centers=.x$M,radii=.x$S2,
+                                                  method="mrpca",std_meth = "symb"))
+
+simulation_results_long = parameters %>% mutate(generated_data=data_list,
+                                             results_S1=results_list_S1,
+                                             results_S2=results_list_S2) %>% 
+  pivot_longer(cols = c(results_S1,results_S2),values_to="results", names_to="scenario") %>% 
+  separate(scenario,into = c("to_remove","scenario"),sep = "_") %>%
+  dplyr::select(-to_remove) %>% 
+  mutate(iterations = results %>%  map_dbl( ~(.x[["counter"]])),
+          in_cen = results %>%  map_dbl( ~(.x[["inertia_centers"]])),
+         in_rad = results %>%  map_dbl( ~(.x[["inertia_radii"]])),
+         in_tot = results %>%  map_dbl( ~(.x[["inertia_total"]])),
+         in_reco = results %>%  map_dbl( ~(.x[["inertia_reco_perc"]]))
+  )
+
+
+simulation_results =simulation_results_long%>% 
+  group_by(scenario, tau, alpha) %>%
+  summarise(
+    av_iter = mean(iterations),
+    sd_iter = sd(iterations),
+    av_reco = mean(in_reco),
+    sd_reco = sd(in_reco),
+    av_in_cen = mean(in_cen),
+    sd_in_cen = sd(in_cen),
+    av_in_rad = mean(in_rad),
+    sd_in_rad = sd(in_rad),
+    av_in_tot = mean(in_tot),
+    sd_in_tot = sd(in_tot), .groups = "rowwise"
+  ) %>% arrange(scenario,desc(tau),alpha) %>% 
+  mutate(av_perc_in_cen = av_in_cen/av_in_tot,
+         av_perc_in_rad = av_in_rad/av_in_tot) %>% 
+  dplyr::select(scenario:alpha,av_reco,sd_reco,av_iter,sd_iter,av_perc_in_cen,av_perc_in_rad) 
+
+# knitr::kable(simulation_results, format = "latex", booktabs = TRUE,digits = c(1,1,1,2,3,2,3,2,2))
+
+save(file="simulation_results.RData",simulation_results)
+
+```
+
 

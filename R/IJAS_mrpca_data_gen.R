@@ -1,17 +1,14 @@
 library(tidyverse)
 library(MASS)
+source("R/interval_data_maker.R")
 set.seed(1234)
-
 alpha<-c(0.2,0.5,0.8)
 tau<-c(0.8,0.6,0.4)
-
-
 parameters = tibble(alpha,tau) %>% expand(alpha,tau,rep = 1:100)
 
 
 
-source("interval_data_maker.R")
-source("interval_PCA.R")
+
 list_pams = parameters %>% pmap(~c(...))
 # list_pams [[1]][2] %>% as.numeric 
 
@@ -36,7 +33,6 @@ simulation_results_long = parameters %>% mutate(generated_data=data_list,
          in_reco = results %>%  map_dbl( ~(.x[["inertia_reco_perc"]]))
   ) 
 
-simulation_results_long %>% 
 
 simulation_results =simulation_results_long%>% 
   group_by(scenario, tau, alpha) %>%
@@ -56,23 +52,15 @@ simulation_results =simulation_results_long%>%
          av_perc_in_rad = av_in_rad/av_in_tot) %>% 
   dplyr::select(scenario:alpha,av_reco,sd_reco,av_iter,sd_iter,av_perc_in_cen,av_perc_in_rad) 
 
-knitr::kable(simulation_results, format = "latex", booktabs = TRUE,digits = c(1,1,1,2,3,2,3,2,2))
+# knitr::kable(simulation_results, format = "latex", booktabs = TRUE,digits = c(1,1,1,2,3,2,3,2,2))
 
-?kable
-library(kableExtra)
+save(file="simulation_results.RData",simulation_results)
 
 
-simulation_results %>% filter(scenario=="S1") %>% dplyr::select(alpha,tau,av_iter,sd_iter) 
 
-knitr::kable(simulation_results %>% dplyr::select(alpha,tau,av_iter,sd_iter,av_reco) , format = "latex", booktabs = TRUE,digits = 3)
+# simulation_results %>% filter(scenario=="S1") %>% dplyr::select(alpha,tau,av_iter,sd_iter) 
+kable(simulation_results) %>% kableExtra::kable_styling(bootstrap_options = "basic")
 
-# out=interval_PCA(centers=data_list[[1]]$M,radii=data_list[[1]]$S1,method="mrpca",std_meth = "symb")
-# out$counter
-# out$inertia_centers
-# out$inertia_radii
-# out$inertia_reconstructed
-############################################################
-############################################################
-## INITIALIZATION   ########################################
-############################################################
-############################################################
+
+# kable(simulation_results %>% dplyr::select(alpha,tau,av_iter,sd_iter,av_reco) , format = "latex", booktabs = TRUE,digits = 3)
+
