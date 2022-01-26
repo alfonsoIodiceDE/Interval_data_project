@@ -54,7 +54,7 @@ simulation_results =simulation_results_long%>%
 
 # knitr::kable(simulation_results, format = "latex", booktabs = TRUE,digits = c(1,1,1,2,3,2,3,2,2))
 
-save(file="simulation_results.RData",simulation_results)
+save(file="data/simulation_results.RData",simulation_results)
 
 
 

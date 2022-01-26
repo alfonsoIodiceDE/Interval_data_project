@@ -16,6 +16,7 @@ This is the code needed to replicate the application as reported in the paper.
 library("tidyverse")
 library("FactoMineR")
 library("janitor")
+library("kableExtra")
 library("patchwork")
 source("R/interval_PCA.R")
 source("R/interval_PCA.R")
@@ -136,8 +137,13 @@ simulation_results =simulation_results_long%>%
 
 # knitr::kable(simulation_results, format = "latex", booktabs = TRUE,digits = c(1,1,1,2,3,2,3,2,2))
 
-save(file="simulation_results.RData",simulation_results)
+save(file="./data/simulation_results.RData",simulation_results)
 
 ```
 
+
+```{r}
+load(file="./data/simulation_results.RData")
+simulation_results %>% knitr::kable() %>% kableExtra::kable_styling(bootstrap_options = "basic")
+```
 
